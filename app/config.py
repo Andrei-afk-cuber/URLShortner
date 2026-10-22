@@ -28,9 +28,12 @@ class DBSettings(SettingsBase):
     # validate model
     @model_validator(mode="after")
     def check_url(self):
-        PostgresDsn(url=self.url)
+        TypeAdapter(PostgresDsn).validate_python(self.url)
         return self
 
-settings = DBSettings()
 
-print(settings)
+# General entrypoint settings class
+class Settings(BaseSettings):
+    db: DBSettings = Field(default_factory=DBSettings)
+
+settings = Settings()
