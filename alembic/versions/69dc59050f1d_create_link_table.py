@@ -1,8 +1,8 @@
-"""Create Link model.
+"""Create link table
 
-Revision ID: 07bab3951c85
+Revision ID: 69dc59050f1d
 Revises: 
-Create Date: 2026-10-22 14:32:11.206730
+Create Date: 2026-10-23 15:26:25.688340
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '07bab3951c85'
+revision: str = '69dc59050f1d'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -27,7 +27,8 @@ def upgrade() -> None:
     sa.Column('original_url', sa.String(), nullable=False),
     sa.Column('created_at', sa.TIMESTAMP(timezone=True), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
     sa.Column('clicks', sa.BigInteger(), nullable=False),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('code')
     )
     # ### end Alembic commands ###
 
