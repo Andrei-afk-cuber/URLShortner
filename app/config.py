@@ -14,6 +14,7 @@ class SettingsBase(BaseSettings):
 class DBSettings(SettingsBase):
     host: str = Field(alias="DB_HOST")
     port: int = Field(alias="DB_PORT")
+    test_port: int = Field(alias="DB_TEST_PORT")
     user: str = Field(alias="DB_USER")
     password: str = Field(alias="DB_PASSWORD")
     database: str = Field(alias="DB_NAME")

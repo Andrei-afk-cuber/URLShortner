@@ -29,7 +29,7 @@ async def get_link_by_code(session: AsyncSession, code: str):
 
 # Clicks update
 async def update_clicks(session: AsyncSession, link_id: int):
-    link = await session.get(LinkBase, link_id)
+    link = await session.get(Link, link_id)
     if not link:
         raise HTTPException(status_code=404, detail="Link not found")
     link.clicks += 1
