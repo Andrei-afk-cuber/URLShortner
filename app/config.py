@@ -40,6 +40,13 @@ class DBSettings(SettingsBase):
         return self
 
 
+    # validate test url
+    @model_validator(mode="after")
+    def check_test_url(self):
+        TypeAdapter(PostgresDsn).validate_python(self.test_url)
+        return self
+
+
 # General entrypoint settings class
 class Settings(BaseSettings):
     db: DBSettings = Field(default_factory=DBSettings)
