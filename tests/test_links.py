@@ -1,11 +1,9 @@
-import pytest
-
 from app.schemas import LinkPublic
 
 
+# API test class
 class TestAPI:
     # Test health endpoint
-    @pytest.mark.anyio
     async def test_health(self, client):
         response = await client.get("/health")
 
@@ -14,8 +12,7 @@ class TestAPI:
 
 
     # Test code generation
-    @pytest.mark.anyio
-    async def test_main_api_enfpoints(self, client):
+    async def test_main_api_endpoints(self, client):
         data = {"original_url": "https://www.google.com"}
         response = await client.post("/shorten", json=data)
 
