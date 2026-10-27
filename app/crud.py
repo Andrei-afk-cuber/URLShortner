@@ -1,7 +1,7 @@
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException
 from fastapi.encoders import jsonable_encoder
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from .models import Link
 from .schemas import LinkBase
@@ -10,12 +10,12 @@ from .services import encode_base62
 
 # Create link function
 async def create_link(session: AsyncSession, link: LinkBase) -> Link:
-    link = Link(**jsonable_encoder(link), code="code")
-    session.add(link)
+    link_orm = Link(**jsonable_encoder(link), code="code")
+    session.add(link_orm)
     await session.flush()
-    link.code = encode_base62(link.id)
+    link_orm.code = encode_base62(link_orm.id)
     await session.commit()
-    return link
+    return link_orm
 
 
 # Get link function

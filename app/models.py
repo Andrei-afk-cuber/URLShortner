@@ -1,8 +1,8 @@
 from datetime import datetime
 
-from sqlalchemy import String, TIMESTAMP, BigInteger, text
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy import TIMESTAMP, BigInteger, String, text
 from sqlalchemy.ext.asyncio import AsyncAttrs
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
 class Base(AsyncAttrs, DeclarativeBase):
@@ -18,6 +18,6 @@ class Link(Base):
     created_at: Mapped[datetime] = mapped_column(
         TIMESTAMP(timezone=True),
         server_default=text("CURRENT_TIMESTAMP"),
-        nullable=False
+        nullable=False,
     )
     clicks: Mapped[int] = mapped_column(BigInteger, default=0)
