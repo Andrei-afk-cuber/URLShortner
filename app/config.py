@@ -26,6 +26,13 @@ class DBSettings(SettingsBase):
         return f"postgresql+asyncpg://{self.user}:{self.password}@{self.host}:{self.port}/{self.database}"
 
 
+    # compute test db url
+    @computed_field
+    @property
+    def test_url(self) -> str:
+        return f"postgresql+asyncpg://{self.user}:{self.password}@{self.host}:{self.test_port}/{self.database}"
+
+
     # validate model
     @model_validator(mode="after")
     def check_url(self):
