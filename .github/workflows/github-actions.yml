@@ -2,10 +2,10 @@ name: Test And Lint
 on:
   push:
     branches:
-      - main
+      - master
   pull_request:
     branches:
-      - main
+      - master
 
 env:
   REGISTRY: ghcr.io
@@ -30,25 +30,25 @@ jobs:
           pip install ruff
           ruff check .
 
-tests:
-  name: Integration & Unit Tests
-  runs-on: ubuntu-latest
-  steps:
-    - name: Checkout registry
-      uses: actions/checkout@v7
+  tests:
+    name: Integration & Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout registry
+        uses: actions/checkout@v7
 
-    - name: Create .env file
-      run: |
-        cat << EOF > .env
-        DB_PASSWORD=${{ vars.DB_PASSWORD || password }}
-        DB_USER=${{ vars.DB_USER || postgres }}
-        DB_HOST=${{ vars.DB_HOST || 127.0.0.1 }}
-        DB_PORT=${{ vars.DB_PORT || 5432 }}
-        DB_TEST_PORT=${{ vars.DB_TEST_PORT || 5433 }}
-        DB_NAME=${{ vars.DB_NAME || postgres }}
+      - name: Create .env file
+        run: |
+          cat << EOF > .env
+          DB_PASSWORD=${{ vars.DB_PASSWORD || password }}
+          DB_USER=${{ vars.DB_USER || postgres }}
+          DB_HOST=${{ vars.DB_HOST || 127.0.0.1 }}
+          DB_PORT=${{ vars.DB_PORT || 5432 }}
+          DB_TEST_PORT=${{ vars.DB_TEST_PORT || 5433 }}
+          DB_NAME=${{ vars.DB_NAME || postgres }}
 
-    - name: Start services
-      run: docker-compose up -d --wait app db
+      - name: Start services
+        run: docker-compose up -d --wait app db
 
-    - name: Run test via Docker Compose
-      run: docker-compose run --rm test
+      - name: Run test via Docker Compose
+        run: docker-compose run --rm test
