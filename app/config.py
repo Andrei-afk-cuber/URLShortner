@@ -1,14 +1,24 @@
 from pathlib import Path
 
-from pydantic import Field, PostgresDsn, TypeAdapter, computed_field, model_validator
+from pydantic import (
+    Field,
+    PostgresDsn,
+    RedisDsn,
+    TypeAdapter,
+    computed_field,
+    model_validator,
+)
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+# Path to .env file
 ENV_FILE = Path(__file__).resolve().parent.parent / ".env"
 
 
 # Settings base
 class SettingsBase(BaseSettings):
-    model_config = SettingsConfigDict(validate_default=False, env_file=ENV_FILE)
+    model_config = SettingsConfigDict(
+        validate_default=False, env_file=ENV_FILE, extra="ignore"
+    )
 
 
 # DBSettings model
@@ -45,9 +55,30 @@ class DBSettings(SettingsBase):
         return self
 
 
+# Redis settings model
+class RedisSettings(SettingsBase):
+    port: int = Field(alias="REDIS_PORT")
+    test_port: int = Field(alias="REDIS_TEST_PORT")
+    host: str = Field(alias="REDIS_HOST")
+    password: str = Field(alias="REDIS_PASSWORD")
+
+    # Compute connection string
+    @computed_field
+    @property
+    def url(self) -> str:
+        return f"redis://:{self.password}@{self.host}:{self.port}/0"
+
+    # Validate url
+    @model_validator(mode="after")
+    def check_url(self):
+        TypeAdapter(RedisDsn).validate_python(self.url)
+        return self
+
+
 # General entrypoint settings class
-class Settings(BaseSettings):
+class Settings(SettingsBase):
     db: DBSettings = Field(default_factory=DBSettings)
+    redis: RedisSettings = Field(default_factory=RedisSettings)
 
 
 settings = Settings()

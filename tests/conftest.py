@@ -1,4 +1,5 @@
 import pytest_asyncio
+import redis.asyncio as redis
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
@@ -46,9 +47,24 @@ async def db_session(test_engine, prepare_database):
         yield session
 
 
+# Redis client fixture
+@pytest_asyncio.fixture(scope="function", loop_scope="function")
+async def redis_client():
+    client = redis.Redis(
+        host=settings.redis.host,
+        port=settings.redis.test_port,
+        password=settings.redis.password,
+        decode_responses=True,
+    )
+    app.state.redis = client
+    yield client
+    await client.aclose()
+    await client.flushdb()
+
+
 # Client fixture
 @pytest_asyncio.fixture(scope="function", loop_scope="function")
-async def client(db_session):
+async def client(db_session, redis_client):
     async def override_get_db():
         yield db_session
 
