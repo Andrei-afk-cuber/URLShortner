@@ -47,8 +47,5 @@ jobs:
           DB_TEST_PORT=${{ vars.DB_TEST_PORT || '5433' }}
           DB_NAME=${{ vars.DB_NAME || 'postgres' }}
 
-      - name: Start services
-        run: docker compose up -d --wait app db
-
       - name: Run test via Docker Compose
-        run: docker compose run --rm test
+        run: docker compose up test --build
