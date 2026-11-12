@@ -1,13 +1,19 @@
 from fastapi import FastAPI, Request
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import RedirectResponse, Response
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from slowapi.util import get_remote_address
 
 from .cache_utills import lifespan
 from .crud import create_link, get_link_by_code, update_clicks
 from .database import session_dep
 from .schemas import LinkBase, LinkPublic
 
+limiter = Limiter(key_func=get_remote_address)
 app = FastAPI(lifespan=lifespan)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 
 # Health check path
@@ -18,13 +24,15 @@ async def health():
 
 # Validate URL and generate code
 @app.post("/shorten", response_class=Response)
-async def code_generation(link: LinkBase, session: session_dep):
+@limiter.limit("5/minute")
+async def code_generation(request: Request, link: LinkBase, session: session_dep):
     link_orm = await create_link(session, link)
     return Response(content=link_orm.code, status_code=201)
 
 
 # Redirect and counter increment
 @app.get("/{code}")
+@limiter.limit("5/minute")
 async def code(request: Request, code: str, session: session_dep):
     # Try to get cache
     redis_client = request.app.state.redis
@@ -47,6 +55,7 @@ async def code(request: Request, code: str, session: session_dep):
 
 # Getting code stats
 @app.get("/stats/{code}", response_model=LinkPublic)
+@limiter.limit("5/minute")
 async def stats(request: Request, code: str, session: session_dep):
     # Get data from cache
     redis_client = request.app.state.redis
