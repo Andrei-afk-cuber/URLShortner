@@ -46,6 +46,10 @@ jobs:
           DB_PORT=${{ vars.DB_PORT || '5432' }}
           DB_TEST_PORT=${{ vars.DB_TEST_PORT || '5433' }}
           DB_NAME=${{ vars.DB_NAME || 'postgres' }}
+          REDIS_HOST=${{ vars.REDIS_HOST || '127.0.0.1' }}
+          REDIS_PORT=${{ vars.REDIS_PORT || '6379' }}
+          REDIS_TEST_PORT=${{ vars.REDIS_TEST_PORT || '6380' }}
+          REDIS_PASSWORD=${{ vars.REDIS_PASSWORD || 'test_password' }}
 
       - name: Run test via Docker Compose
         run: docker compose up test --build
